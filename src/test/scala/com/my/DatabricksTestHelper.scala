@@ -11,8 +11,8 @@ import scala.util.Try
 
 trait DatabricksTestHelper extends AbstractSparkTestsHelper {
 
-  private def hivePath = new File("./target/hive").getAbsolutePath
-  private def hiveMetastoreDBLocation = s"./target/metastore_db_for_tests${System.currentTimeMillis()}"
+  private def hivePath = new File(s"$getTempDir/hive").getAbsolutePath
+  private def hiveMetastoreDBLocation = s"$getTempDir/metastore_db_for_tests${System.currentTimeMillis()}"
 
   override def mutateSparkConfig(sparkConf: SparkConf): SparkConf = {
     super.mutateSparkConfig(sparkConf)
@@ -20,20 +20,13 @@ trait DatabricksTestHelper extends AbstractSparkTestsHelper {
       .set("spark.sql.catalogImplementation", "hive")
       .set("hive.metastore.warehouse.dir", hivePath)
       .set("javax.jdo.option.ConnectionURL", s"jdbc:derby:;databaseName=$hiveMetastoreDBLocation;create=true")
+      .set("hive.exec.scratchdir", s"$getTempDir/hiveScratchDir")
   }
 
   protected def sqlContext: SparkSession = SparkSession.builder().enableHiveSupport().getOrCreate()
 
   protected def initTables(deltaTables: List[String]): Unit = {
-    deltaTables.filter(
-      _.contains(".")
-    ).flatMap(
-      fieldName =>
-        fieldName.split("\\.").headOption
-    ).distinct
-      .foreach(databaseName =>
-        sqlContext.sql(s"create database if not exists $databaseName")
-      )
+    initDatabases(deltaTables)
 
     for {
       tableDirectory <- new File("./src/test/resources/sql").listFiles.toIterator
@@ -59,6 +52,18 @@ trait DatabricksTestHelper extends AbstractSparkTestsHelper {
 
       bufferedSource.close()
     }
+  }
+
+  private def initDatabases(deltaTables: List[String]): Unit = {
+    deltaTables.filter(
+      _.contains(".")
+    ).flatMap(
+      fieldName =>
+        fieldName.split("\\.").headOption
+    ).distinct
+      .foreach(databaseName =>
+        sqlContext.sql(s"create database if not exists $databaseName")
+      )
   }
 
   protected def cleanTables(deltaTables: List[String]): Unit = {

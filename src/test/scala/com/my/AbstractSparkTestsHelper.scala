@@ -2,6 +2,7 @@ package com.my
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.log4j.{Level, Logger}
+import java.nio.file.Paths
 
 trait AbstractSparkTestsHelper {
 
@@ -11,14 +12,14 @@ trait AbstractSparkTestsHelper {
     .set("spark.broadcast.compress", "false")
     .set("spark.sql.catalogImplementation", "hive")
     .setMaster("local[*]")
-    .set("spark.local.dir", "./target")
+    .set("spark.local.dir", s"$getTempDir")
     .setAppName(this.getClass.getName + "TestApp")
     .set("spark.app.id", "local-1231231231")
     .set("spark.ui.enabled", "false"))
 
   protected implicit var sc: SparkContext = _
 
-  protected def initSpark() {
+  protected def initSpark(): Unit = {
     Logger.getRootLogger.setLevel(Level.ERROR)
     sc = new SparkContext(sparkConfig)
     Logger.getRootLogger.setLevel(Level.ERROR)
@@ -26,7 +27,7 @@ trait AbstractSparkTestsHelper {
 
   protected def afterStopSpark(): Unit = {}
 
-  protected def stopSpark() {
+  protected def stopSpark(): Unit = {
     try {
       Logger.getRootLogger.setLevel(Level.ERROR)
       sc.stop()
@@ -37,4 +38,6 @@ trait AbstractSparkTestsHelper {
 
     Logger.getRootLogger.setLevel(Level.ERROR)
   }
+
+  protected def getTempDir: String = s"${Paths.get(".").toAbsolutePath}/target"
 }
