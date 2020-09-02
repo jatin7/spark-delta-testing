@@ -6,6 +6,5 @@ object MyTest {
   def main(args: Array[String]): Unit = {
     //println("All interesting is in test folder")
    val spark = SparkSession.builder().getOrCreate()
-
   }
 }
