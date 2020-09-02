@@ -10,11 +10,10 @@ trait AbstractSparkTestsHelper {
 
   protected val sparkConfig: SparkConf = mutateSparkConfig(new SparkConf()
     .set("spark.broadcast.compress", "false")
-    .set("spark.sql.catalogImplementation", "hive")
     .setMaster("local[*]")
     .set("spark.local.dir", s"$getTempDir")
     .setAppName(this.getClass.getName + "TestApp")
-    .set("spark.app.id", "local-1231231231")
+    .set("spark.app.id", "local-test")
     .set("spark.ui.enabled", "false"))
 
   protected implicit var sc: SparkContext = _
