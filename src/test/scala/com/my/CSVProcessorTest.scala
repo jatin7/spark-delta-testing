@@ -4,7 +4,7 @@ import org.scalatest.{GivenWhenThen, Matchers}
 
 class CSVProcessorTest extends SparkTestSpec with GivenWhenThen with Matchers {
 
-  "CSV Processor" should "be read file properly" in {
+  "CSV Processor" should "read file properly" in {
     Given("CSV processor")
     val processor = CSVProcessor(spark)
 
