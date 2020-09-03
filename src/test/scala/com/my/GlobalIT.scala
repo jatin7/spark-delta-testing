@@ -17,8 +17,11 @@ class GlobalIT extends  SparkTestSpec with GivenWhenThen with Matchers {
     println(fieldsDefinition)
     val result = csvProcessor.convertDataTypes(filteredValues, fieldsDefinition)
 
+    val dataProfile = csvProcessor.dataProfilingSimplest(result)
+
     Then("should return expected row count")
     result.show()
     result.count() should equal(3L)
+    println(dataProfile)
   }
 }
