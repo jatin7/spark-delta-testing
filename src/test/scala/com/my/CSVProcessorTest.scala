@@ -1,5 +1,6 @@
 package com.my
 
+import org.scalatest.Matchers.atMostOneOf
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class CSVProcessorTest extends SparkTestSpec with GivenWhenThen with Matchers {
@@ -13,7 +14,9 @@ class CSVProcessorTest extends SparkTestSpec with GivenWhenThen with Matchers {
 
     Then("should return expected row count")
     result.show()
-    result.count() should equal(7L)
+    result.count() should equal(6L)
+    result.columns should contain("name")
+    result.columns should contain("age")
   }
 
   "CSV Processor" should "filter empty rows out" in {

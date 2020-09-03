@@ -5,7 +5,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 case class CSVProcessor(@transient spark: SparkSession) {
   def read(dataPath: String): DataFrame = {
-    spark.read.csv(dataPath)
+    spark.read.option("header","true").option("quote", "'").csv(dataPath)
   }
 
   def filterEmptyValues(input: DataFrame): DataFrame = {
@@ -17,7 +17,8 @@ case class CSVProcessor(@transient spark: SparkSession) {
     }
   }
 
-//  def convertDataTypes(inputDataFrame: DataFrame) = {
-//    //stub
-//  }
+  def convertDataTypes(inputDataFrame: DataFrame, sql: String): DataFrame = {
+    inputDataFrame.createOrReplaceTempView("justView")
+    spark.sql(s"select $sql from justView")
+  }
 }
